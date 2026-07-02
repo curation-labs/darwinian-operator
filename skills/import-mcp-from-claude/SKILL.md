@@ -60,8 +60,10 @@ For each server requiring `drwn library add mcp`:
    | `command` | `command` | passthrough for stdio |
    | `args` | `args` | passthrough |
    | `env` | `env` | passthrough |
-   | `headers` | `headers` (drwn >= 0.6.0) | passthrough — replace literal secrets with `${ENV_VAR}` placeholders; drwn expands them at write time. Never copy a literal token into a drwn manifest. |
+   | `headers` | `headers` | Passthrough as a string map (drwn ≥ 0.6.0). Per target: Claude keeps `${VAR}` verbatim, Cursor rewrites to `${env:VAR}`, Codex maps `Authorization: Bearer ${VAR}` → `bearer_token_env_var` and literal headers → `http_headers`. A **non-bearer** `${VAR}` header can't be expressed on Codex — drwn warns at write time and omits it (still carries on Claude/Cursor). |
    | `headersHelper`, per-server OAuth client metadata, custom timeout/loading fields | (no equivalent today) | **WARN the user** — do not silently drop auth-critical fields. Ask whether to (a) drop them and import with known limitations, (b) abort, or (c) keep the server in Claude and skip the import. |
+
+   When a `headers` value holds an inline literal secret (e.g. `Bearer sk-...`), do **not** import it verbatim: prompt for an env var name (e.g. `FAL_KEY`), replace the secret with `${ENV_VAR}`, and record the variable in `notes`. Only the `${ENV_VAR}` reference is ever written to the library or a card.
 
 2. Add drwn-specific fields that Claude doesn't track:
    - `description` (required by drwn): ask the user for a one-line purpose. Suggest a default derived from the name (e.g., `"<name> MCP server (imported from Claude Code)"`).
