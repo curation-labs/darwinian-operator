@@ -52,12 +52,11 @@ agent-tool files.
    4. If the user chooses a card, capture the spec.
 10. If a card was chosen and the user approves, run `drwn apply <card-spec>`.
    Explain that this mutates project config and `card.lock` immediately, while
-   downstream tool state updates only on the next write. Also explain that an
-   absent `activeMinds` setting means all installed cards are active in
-   lockfile order; use `manage-active-mind-stack` if the user wants a smaller
-   or reordered stack.
-11. Run `drwn mind list --json` after applying cards when the user asks what
-   minds will be active.
+   downstream tool state updates only on the next write. A single applied root
+   becomes the selected Worker. Multiple roots require `--active <root>` or
+   `--none`; use `manage-active-mind-stack` for later selection changes.
+11. Run `drwn status --json` after applying Cards when the user asks which
+   Worker is selected.
 12. Preview the final materialization with `drwn write --dry-run --json`.
 13. On approval, run `drwn write`.
 14. If the user wants provenance for a newly active skill or MCP server, run
@@ -81,7 +80,7 @@ agent-tool files.
 `drwn store status --json`, `drwn store migrate`, `drwn init`,
 `drwn extensions add`, `drwn extensions setup`, `drwn card list --json`,
 `drwn search card --json`, `drwn search skill --json`, `drwn search mcp --json`,
-`drwn apply`, `drwn mind list --json`, `drwn write --dry-run --json`,
+`drwn apply`, `drwn card status --json`, `drwn write --dry-run --json`,
 `drwn write`
 
 ## Scope

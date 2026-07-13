@@ -83,7 +83,7 @@ A read-only audit report. No file changes, no pushes, no commits.
 ## Failure Modes
 
 - **Card not installed**: skip with a note ("@scope/foo not installed; use
-  `drwn card add` first if you want to audit installed state").
+  `drwn add` first if you want to audit installed state").
 - **No card sources on this machine** with `--sources`: report empty,
   suggest `drwn card new`.
 - **Manifest read fails**: surface the error per card; continue with

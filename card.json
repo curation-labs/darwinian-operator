@@ -1,6 +1,6 @@
 {
   "name": "@darwinian/operator",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Primary Darwinian Minds card: the skills an agent needs to operate minds through drwn — bootstrap, cards, library, defaults, inspection, repair, and support.",
   "skills": {
     "include": [

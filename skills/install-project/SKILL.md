@@ -13,7 +13,7 @@ materialization, and then apply the locked mind state.
 
 Requires `drwn` on PATH. Scope is project plus local card store. Blast radius is
 medium because `drwn install` can clone or fetch Git-backed cards, refresh
-lock-derived paths, and write downstream generated state unless `--no-apply` is
+lock-derived paths, and write downstream generated state unless `--no-write` is
 used.
 
 ## Procedure
@@ -29,44 +29,44 @@ used.
    Store migration is machine-wide and should not be hidden inside clone
    bootstrap.
 5. For verification-only or CI requests, run
-   `drwn install --frozen --no-apply --json`.
+   `drwn install --frozen --no-write --json`.
    - If it succeeds, report that all locked cards are locally present and no
      downstream write was performed.
    - If it fails, explain which locked card or Git origin needs fetching or
      local repair.
 6. For normal clone bootstrap, first run
-   `drwn install --frozen --no-apply --json` as a read-only feasibility check.
+   `drwn install --frozen --no-write --json` as a read-only feasibility check.
    Treat a failure as useful preflight information, not as the end of the flow.
 7. If fetching, cloning, or lockfile path refresh is needed, explain that
-   `drwn install --no-apply --json` mutates the local card store and may refresh
+   `drwn install --no-write --json` mutates the local card store and may refresh
    `.agents/drwn/card.lock`, but does not write `.claude/`, `.codex/`, or
    `.cursor/`.
-8. On approval, run `drwn install --no-apply --json`.
+8. On approval, run `drwn install --no-write --json`.
 9. If card install reports errors, surface them and stop before any downstream
    write.
-10. Run `drwn mind list --json` when the user asks which locked minds will be
-   active. Absent `activeMinds` means all installed cards are active in
-   lockfile order; explicit `activeMinds: []` means no composed mind is active.
+10. Run `drwn status --json` when the user asks which locked Worker is active.
+    The project declares one or more roots and selects at most one Worker;
+    alternative roots never activate implicitly.
 11. Preview materialization with `drwn write --dry-run --json`.
 12. If the dry run has no changes, verify with `drwn doctor --json` and stop.
 13. On approval, run `drwn install --json` to re-verify locked cards and write
    the effective project state in one install operation.
-14. Confirm the result with `drwn status --json`, `drwn mind list --json`,
-   and `drwn doctor --json`.
+14. Confirm the result with `drwn status --json`, `drwn card status --json`,
+    and `drwn doctor --json`.
 
 ## User-Ask Points
 
-1. Confirm moving from frozen/no-apply verification to non-frozen
-   `drwn install --no-apply --json`.
+1. Confirm moving from frozen/no-write verification to non-frozen
+   `drwn install --no-write --json`.
 2. Confirm downstream materialization after reviewing
    `drwn write --dry-run --json`.
 
 ## Wraps
 
 `drwn --version`, `drwn status --json`, `drwn store status --json`,
-`drwn install --frozen --no-apply --json`,
-`drwn install --no-apply --json`, `drwn write --dry-run --json`,
-`drwn mind list --json`, `drwn install --json`, `drwn doctor --json`
+`drwn install --frozen --no-write --json`,
+`drwn install --no-write --json`, `drwn write --dry-run --json`,
+`drwn card status --json`, `drwn install --json`, `drwn doctor --json`
 
 ## Scope
 

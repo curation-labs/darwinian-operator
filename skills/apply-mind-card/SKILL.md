@@ -7,10 +7,9 @@ description: "Use when applying, adding, pinning, removing, updating, detaching,
 
 ## Purpose
 
-Manage the project's Mind Card set: apply a fresh set, add or remove
-individual cards, pin exact versions, refresh the lockfile, detach the project
-from cards entirely, inspect what is currently applied, and manage explicit
-hook consent for cards that declare hook policies.
+Manage the project's Worker roots: replace the complete set, add or remove one
+root, pin exact versions, refresh the lock graph, clear all roots, inspect what
+is currently applied, and manage explicit hook consent for locked Cards.
 
 Requires `drwn` on PATH. Scope is project. Blast radius is medium because this
 skill mutates project config, `card.lock`, and usually downstream generated
@@ -31,23 +30,23 @@ locked card has valid hook consent recorded in `card.lock`.
 2. Read published local card inventory with `drwn card list --json`.
 3. Disambiguate intent:
    - Apply a full set: `drwn apply <spec> ...`
-   - Add one: `drwn card add <spec>`
-   - Pin one: `drwn card pin <spec>`
-   - Remove one: `drwn card remove <name>`
-   - Detach all cards: `drwn card detach`
-   - Refresh lockfile: `drwn card update`
+   - Add one root: `drwn add <spec>`
+   - Pin one root: `drwn pin <spec>`
+   - Remove one root: `drwn remove <name>`
+   - Clear all roots: `drwn apply --none`
+   - Refresh the lock graph: `drwn update [name]`
+   - Select one Worker: `drwn use <root>`
+   - Clear Worker selection while keeping roots: `drwn use --none`
    - Inspect updates: `drwn card outdated --json`
    - Fetch remote update candidates: `drwn card outdated --fetch --json`
    - Trust card hooks: `drwn card trust <card> --hooks [--range <range>]`
    - Clear card hook consent: `drwn card untrust <card> --hooks`
-4. Before a mutating card command, show the exact before/after intent in prose.
-   Card mutations do not support `--dry-run` today.
-5. On approval, run the selected card command.
-6. After a card mutation, run `drwn mind list --json` when the project has
-   installed cards. Explain that absent `activeMinds` means all installed cards
-   are active in lockfile order, while explicit `activeMinds: []` means none
-   are active. If a newly added card is not in an explicit active stack, stop
-   and redirect to `manage-active-mind-stack`.
+4. Preview root mutations with `--dry-run` and show the exact before/after
+   intent. Multiple roots require `--active <root>` or `--none`; they never
+   form an implicit stack.
+5. On approval, run the selected root command without `--dry-run`.
+6. After mutation, run `drwn status --json` and `drwn card status --json`.
+   Report the singular selected Worker or the valid unselected state.
 7. If a locked card declares hooks, inspect it with
    `drwn card show <card>@<version> --json` and summarize its `hookPolicies`.
    If `card status` or `doctor` reports missing or out-of-range hook consent,
@@ -64,15 +63,13 @@ locked card has valid hook consent recorded in `card.lock`.
    before a real write.
 11. On approval, run `drwn write`, adding `--strict-hooks` only when the user
     chose fail-closed hook behavior.
-12. Confirm the result with `drwn card status --json` and, when relevant,
-    `drwn mind list --json`.
+12. Confirm the result with `drwn card status --json` and `drwn status --json`.
 13. If the user wants provenance for a newly active item, run
    `drwn status --why <name>`.
 
 ## User-Ask Points
 
-1. Confirm the requested card-set mutation before any `drwn apply` or
-   `drwn card ...` mutation.
+1. Confirm the requested root-set mutation after reviewing its dry run.
 2. Confirm hook consent before any `drwn card trust <card> --hooks`.
 3. Confirm clearing hook consent before any `drwn card untrust <card> --hooks`.
 4. Confirm optional card MCP activation before any `drwn add mcp <name>`.
@@ -82,9 +79,9 @@ locked card has valid hook consent recorded in `card.lock`.
 ## Wraps
 
 `drwn card status --json`, `drwn card list --json`, `drwn card outdated --json`,
-`drwn card outdated --fetch --json`, `drwn apply`, `drwn card add`,
-`drwn card pin`, `drwn card remove`, `drwn card detach`, `drwn card update`,
-`drwn mind list --json`, `drwn card show --json`, `drwn card trust --hooks`,
+`drwn card outdated --fetch --json`, `drwn apply`, `drwn add`,
+`drwn pin`, `drwn remove`, `drwn update`, `drwn use`,
+`drwn status --json`, `drwn card show --json`, `drwn card trust --hooks`,
 `drwn card untrust --hooks`, `drwn add mcp`, `drwn write --dry-run --json`,
 `drwn write --strict-hooks --dry-run --json`, `drwn write`,
 `drwn write --strict-hooks`, `drwn status --why`
@@ -96,7 +93,7 @@ Project only.
 ## Failure Modes
 
 - Unresolved card spec: surface the exact failure and stop.
-- Duplicate card on add: surface the conflict and suggest `pin` or `update`.
+- Duplicate root on add: surface the conflict and suggest `pin` or `update`.
 - Missing card on remove or pin: tell the user and refer back to the current
   project status.
 - No outdated cards: explain that there is nothing to refresh.
@@ -106,8 +103,8 @@ Project only.
   strict mode only after the user accepts skipped hooks.
 - Optional card MCP skipped: explain that the card made the definition
   available but project activation still requires `drwn add mcp <name>`.
-- New card excluded by explicit `activeMinds`: do not silently activate it;
-  redirect to `manage-active-mind-stack`.
+- Multiple roots without a selected Worker: report the unselected state and
+  redirect selection requests to `manage-active-mind-stack`.
 
 ## Related Skills
 

@@ -22,14 +22,11 @@ Requires `drwn` on PATH. Scope is project, read-only. Blast radius is none.
 3. If the user asks for a full explanation, run `drwn status --explain`.
 4. Run `drwn doctor --json` to surface drift, stale state, or broken symlinks.
 5. Run `drwn card status --explain` to surface card-level provenance.
-6. Run `drwn mind list --json` when the user asks about minds, active stack
-   behavior, or why a Mind Card is or is not projected.
-7. Inspect generated mind artifacts when relevant:
-   `.agents/drwn/generated/minds.json`, per-mind
-   `.agents/drwn/generated/minds/<scope>/<name>/mind.json`, and composed
-   `.agents/drwn/generated/mind/mind.json`.
-   Explain that absent `activeMinds` means all installed cards are active,
-   while explicit `activeMinds: []` means no composed mind should exist.
+6. Use `drwn status --json` and `drwn card status --explain` when the user asks
+   which Worker is selected or why a Card is or is not in its Blueprint.
+7. Inspect aggregate generated artifacts when relevant. Explain that Cards in
+   the selected Worker's resolved Blueprint compose into one aggregate view;
+   alternative roots are installed options and never activate implicitly.
 8. Run `drwn store status --json` to surface store health and legacy-layout
    detection.
 9. If the user named a published card, run `drwn card show <ref> --json` and
@@ -52,7 +49,7 @@ If the user asks to fix something, stop and redirect to `repair-minds`.
 
 `drwn status --json`, `drwn status --why`, `drwn status --explain`,
 `drwn doctor --json`, `drwn card status --explain`, `drwn store status --json`,
-`drwn mind list --json`, `drwn card show --json`,
+`drwn card show --json`,
 `drwn write --dry-run --json`,
 `drwn extensions status --json`, `drwn extensions doctor --json`
 
@@ -68,8 +65,8 @@ Project and machine inspection only. No mutations.
 - Legacy layout detected: flag it loudly and point to `repair-minds`.
 - Hook or optional MCP warnings in a write dry-run: explain the impact and point
   to `apply-mind-card` or `materialize-minds`; do not fix them here.
-- `activeMinds: []` with no `.agents/drwn/generated/mind/`: report as expected,
-  not drift.
+- No selected Worker with no aggregate Worker output: report as expected, not
+  drift.
 
 ## Related Skills
 

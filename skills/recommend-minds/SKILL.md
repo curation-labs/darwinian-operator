@@ -18,8 +18,8 @@ Requires `drwn` on PATH. Scope is project, read-only. Blast radius is none.
 
 1. Read current project state with `drwn status --json`.
 2. Read currently applied project cards with `drwn card status --json`.
-3. Read active mind state with `drwn mind list --json` when the recommendation
-   may affect mind composition.
+3. Read the selected Worker and aggregate state from `drwn status --json` when
+   the recommendation may affect Card composition.
 4. Read available local cards with `drwn card list --json`.
 5. Read available library, skill, and extension inventory:
    - `drwn library list --json`
@@ -35,9 +35,9 @@ Requires `drwn` on PATH. Scope is project, read-only. Blast radius is none.
    - why it matches the project
    - which sibling skill should execute it
    - the exact `drwn` command sequence
-9. Distinguish installing/applying a Mind Card from switching the active stack.
-   Applying changes installed cards; activation order changes belong to
-   `manage-active-mind-stack`.
+9. Distinguish changing declared Worker roots from selecting the one active
+   Worker. Root-set changes belong to `apply-mind-card`; selection changes
+   belong to `manage-active-mind-stack`.
 10. For catalog-backed card recommendations, state whether the needed catalog is
    already registered. If it is not registered, direct the user to
    `manage-library` before treating the card as installable.
@@ -55,7 +55,7 @@ If the user asks to apply a recommendation, stop and redirect to
 ## Wraps
 
 `drwn status --json`, `drwn card status --json`, `drwn card list --json`,
-`drwn mind list --json`, `drwn library list --json`, `drwn skills list --json`,
+`drwn library list --json`, `drwn skills list --json`,
 `drwn extensions list --json`, `drwn search card --json`,
 `drwn search skill --json`, `drwn search mcp --json`
 

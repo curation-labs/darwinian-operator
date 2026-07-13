@@ -20,8 +20,8 @@ high.
 
 1. Read current diagnostics with `drwn doctor --json`.
 2. If cards are involved, read `drwn card status --explain`.
-3. Read `drwn mind list --json` when generated mind files or active stack
-   behavior are involved.
+3. Read `drwn status --json` and `drwn card status --json` when generated
+   Worker files or selection behavior are involved.
 4. Read `drwn store status --json` to check for legacy layout.
 5. Classify the issue:
    - Legacy layout detected
@@ -29,7 +29,7 @@ high.
    - Outdated card lock
    - Card hook consent missing or outside the locked version range
    - Optional card MCP definitions skipped because the project has not opted in
-   - Active mind stack mismatch or stale composed mind output
+   - Worker selection mismatch or stale aggregate output
    - Extension-specific health failure
 6. For legacy layout:
    1. Explain what `drwn store migrate` will do.
@@ -41,11 +41,11 @@ high.
    3. On approval, run `drwn write`.
    4. If the fix requires overwriting drwn-owned drift, explain `--force`
       explicitly and ask again before running `drwn write --force`.
-8. For active mind stack mismatches:
-   1. If `activeMinds: []` and `.agents/drwn/generated/mind/` is absent, report
+8. For Worker selection mismatches:
+   1. If no Worker is selected and aggregate Worker output is absent, report
       that as expected.
-   2. Do not automatically add a card to the active stack as a repair.
-   3. Redirect desired stack changes to `manage-active-mind-stack`.
+   2. Do not automatically select an alternative root as a repair.
+   3. Redirect desired selection changes to `manage-active-mind-stack`.
 9. For missing or out-of-range hook consent:
    1. Run `drwn card status --explain` and `drwn write --dry-run --json`.
    2. Inspect the card with `drwn card show <card>@<version> --json` and
@@ -63,7 +63,7 @@ high.
     4. Rerun `drwn write --dry-run --json` and continue through the write path.
 11. For outdated card locks:
     1. Run `drwn card outdated --json`.
-    2. On approval, run `drwn card update`.
+    2. On approval, run `drwn update`.
     3. Then preview with `drwn write --dry-run --json` and continue through the
        write path.
 12. For extension failures:
@@ -81,18 +81,18 @@ high.
 3. Confirm `drwn write --force` with an explicit overwrite warning.
 4. Confirm hook consent before `drwn card trust <card> --hooks`.
 5. Confirm optional MCP activation before `drwn add mcp <name>`.
-6. Confirm `drwn card update`.
+6. Confirm `drwn update`.
 7. Confirm extension setup re-run when external tool setup is involved.
 
 ## Wraps
 
-`drwn doctor --json`, `drwn card status --explain`, `drwn mind list --json`,
+`drwn doctor --json`, `drwn card status --explain`, `drwn status --json`,
 `drwn store status --json`,
 `drwn store migrate`, `drwn write --dry-run --json`, `drwn write`,
 `drwn write --strict-hooks --dry-run --json`, `drwn write --force`,
 `drwn card show --json`, `drwn card trust --hooks`,
 `drwn add mcp --dry-run --json`, `drwn add mcp`,
-`drwn card outdated --json`, `drwn card update`,
+`drwn card outdated --json`, `drwn update`,
 `drwn extensions doctor --json`, `drwn extensions status --json`,
 `drwn extensions setup`
 
@@ -109,8 +109,8 @@ Project first, with machine-store mutation during migration.
 - Hook consent declined: leave hooks skipped and do not run `--strict-hooks`.
 - Optional MCP activation declined: leave the MCP skipped and do not treat it as
   drift.
-- Active stack change requested: redirect to `manage-active-mind-stack`; do not
-  hide activation as repair.
+- Worker selection change requested: redirect to `manage-active-mind-stack`;
+  do not hide selection as repair.
 - Extension setup failure: surface stderr and stop.
 
 ## Related Skills

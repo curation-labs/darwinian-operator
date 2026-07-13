@@ -1,70 +1,55 @@
 ---
 name: manage-defaults
-description: "Use when managing machine-wide Darwinian Minds defaults or the curated publication layer for all projects on this machine."
+description: "Use when managing explicit machine-wide Darwinian capability selections and projecting them into user-scope agent configuration."
 ---
 
 # manage-defaults
 
 ## Purpose
 
-Manage machine-wide defaults in `~/.agents/drwn/machine.json` and the curated
-publication layer at `~/.agents/skills/`. Use `manage-library` for
-package-backed skill bundles, MCP library definitions, and card catalogs before
-making anything a default.
+Manage machine capability intent through the selected machine profile and
+explicit skill or MCP selections. Project capabilities remain project-owned;
+machine capabilities are ambient and are never inherited into project config.
 
-Requires `drwn` on PATH. Scope is machine. Blast radius is high because changes
-affect all future projects on this machine and may update compatibility
-symlinks under `~/.agents/skills`.
+Requires `drwn` on PATH. Scope is machine. Mutating defaults changes
+`~/.agents/drwn/machine.json`; machine writes project those capabilities into
+user-scope Claude, Codex, and Cursor configuration.
 
 ## Procedure
 
-1. Verify `drwn` is installed with `drwn --version`. If it fails, halt and tell
-   the user to install `drwn`.
-2. Read current state with:
-   - `drwn library defaults list --json`
-   - `drwn library list --json`
-   - `drwn skills list --json`
-3. Confirm explicitly that the user wants machine-wide scope.
-4. Disambiguate the intent:
-   - Add or remove a default skill
-   - Add or remove a default MCP server
-   - Curate a shared skill into `~/.agents/skills`
-   - Uncurate a shared skill from `~/.agents/skills`
-   - Inspect available inventory before deciding
-5. For default skill changes:
-   1. Preview with
-      `drwn library defaults add skill <name> --dry-run --json` or
-      `drwn library defaults remove skill <name> --dry-run --json`.
-   2. Explain that add also curates shared skills into `~/.agents/skills`, and
-      remove uncurates the skill if that link exists.
-   3. On approval, run the corresponding command without `--dry-run`.
-6. For default MCP changes:
-   1. Preview with `drwn library defaults add mcp <name> --dry-run --json` or
-      `drwn library defaults remove mcp <name> --dry-run --json`.
-   2. Explain that this changes machine defaults but does not edit a project
-      overlay directly.
-   3. On approval, run the corresponding command without `--dry-run`.
-7. For direct curation:
-   1. Confirm that the user wants publication-layer compatibility without
-      adding the skill to machine defaults.
-   2. Run `drwn skills curate <name> --json` or
-      `drwn skills uncurate <name> --json` after approval.
-8. If the user is currently inside a project and wants the downstream effect
-   materialized there, redirect to `materialize-minds` for the write preview
-   and approval.
-9. Re-read `drwn library defaults list --json` and `drwn skills list --json` to
-   confirm the final machine state.
+1. Read machine capability state with `drwn library defaults list --json` and
+   machine diagnostics with `drwn doctor --json` outside a project.
+2. Distinguish the requested operation:
+   - Inspect machine selections: `drwn library defaults list --json`
+   - Select a skill explicitly: `drwn library defaults add skill <name>`
+   - Remove an explicit skill: `drwn library defaults remove skill <name>`
+   - Select an MCP server explicitly: `drwn library defaults add mcp <name>`
+   - Remove an explicit MCP server: `drwn library defaults remove mcp <name>`
+3. Confirm that the named capability exists in the Library or selected profile.
+4. Preview an add or remove with the corresponding `--dry-run --json` command.
+5. Explain whether the capability is profile-provided or explicitly selected.
+   Removing an explicit selection does not remove the same capability when the
+   selected profile still provides it.
+6. Ask for approval, then run the same defaults command without `--dry-run`.
+7. Preview machine projection with:
+
+   ```bash
+   drwn write --scope machine --dry-run --json
+   ```
+
+8. Summarize ownership conflicts and planned user-scope changes. Ask again
+   before the real machine write.
+9. On approval, run `drwn write --scope machine --json` and verify with
+   `drwn library defaults list --json` plus `drwn doctor --json`.
 
 ## User-Ask Points
 
-1. Confirm machine-wide scope.
-2. Confirm every defaults mutation after dry-run preview.
-3. Confirm direct curate or uncurate intent.
-4. Confirm handoff before downstream project or machine materialization.
+1. Confirm each explicit machine capability selection change.
+2. Confirm machine projection after reviewing the dry run.
+3. Confirm `--force` separately only for drift in previously drwn-owned output.
 
 ## Wraps
 
-`drwn --version`, `drwn library list --json`,
 `drwn library defaults list --json`,
 `drwn library defaults add skill --dry-run --json`,
 `drwn library defaults add skill`,
@@ -73,29 +58,28 @@ symlinks under `~/.agents/skills`.
 `drwn library defaults add mcp --dry-run --json`,
 `drwn library defaults add mcp`,
 `drwn library defaults remove mcp --dry-run --json`,
-`drwn library defaults remove mcp`, `drwn skills curate --json`,
-`drwn skills uncurate --json`, `drwn skills list --json`
+`drwn library defaults remove mcp`,
+`drwn write --scope machine --dry-run --json`,
+`drwn write --scope machine --json`, `drwn doctor --json`
 
 ## Scope
 
-Machine-wide defaults and curated publication layer only. This skill does not
-install bundles, register MCP definitions, manage catalogs, or write downstream
-agent-tool state.
+Machine only. This skill must not mutate project config.
 
 ## Failure Modes
 
-- User wanted project-only scope: redirect to `materialize-minds`.
-- Requested skill or MCP is not available in inventory: redirect to
-  `manage-library` first.
-- Curate/uncurate target missing or not shared-scope: show the current skill
-  list and stop.
-- User asks to write downstream files after changing defaults: redirect to
-  `materialize-minds` for dry-run and approval.
+- Invalid machine config: stop and surface the strict schema diagnostic; do
+  not infer selections from user directories.
+- Unknown capability: show available Library/profile inventory and ask for a
+  precise name.
+- Foreign user-scope destination: report the ownership conflict. Do not claim
+  an unrecorded destination, even when bytes happen to match.
+- Project directory detected: use explicit `--scope machine`; do not treat
+  project capability declarations as machine defaults.
 
 ## Related Skills
 
-- `manage-library`
-- `materialize-minds`
-- `bootstrap-project`
 - `inspect-minds`
+- `materialize-minds`
+- `repair-minds`
 - `recommend-minds`
